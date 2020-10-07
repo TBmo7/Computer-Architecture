@@ -2,17 +2,30 @@
 
 import sys
 
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+MUL = 0b10100010
+ADD = 0b10100000
+SUB = 0b10100001
+PUSH = 0b01000101
+POP = 0b01000110
+
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         self.reg = [0] * 8
-        self.reg[7] = 0xF4
+        self.reg[7] = 0xF4#STACK POINTER
         self.ram = [0] * 256
         self.pc = 0 #program counter
         self.ir = 0 #instruction register
         self.fl = [0] * 8 #Flags
         self.halted = False
+        #self.sp = int() #stack pointer
+        self.SP = self.reg[7]
+        #self.stack = 255 #top of RAM
+        
         
     def ram_read(self,MAR):
         #takes in an address, and returns the value stored there
@@ -26,20 +39,32 @@ class CPU:
 
 
 
-    def load(self,file):
+    def load(self,filename):
         """Load a program into memory."""
-        program = []
+        #program1 = []
+        address = 0
         try:
-            with open(file) as f:
+            with open(filename) as f:
                 for line in f:
-                    program.append(line.split('#')[0].split())
+                    #program1.append(line.split("#"))
+                    line_split = line.split("#")
+                    num = line_split[0].strip()
+                    if num == '':
+                        continue
+                    val = int(num,2)
+                    self.ram_write(address,val)
+                    address += 1
         except:
             print('file not found')
             sys.exit(1)            
+        #self.SP -= 1#set the Stack pointer to the top of memory
+        self.SP = address
+        
+        #program = []    
+        #for element in program1:
+            #program.append(element[0])
 
-
-
-        address = 0
+        #address = 0
 
         # For now, we've just hardcoded a program:
 
@@ -53,15 +78,17 @@ class CPU:
             #0b00000001, # HLT
         #]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        #for instruction in program:
+            #self.ram[address] = bin(instruction)
+            #address += 1
 
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
+        #temp = op
+        #op = bin(temp)
 
-        if op == 0b10100000: #ADD
+        if op == ADD:
             self.reg[reg_a] += self.reg[reg_b]
             self.pc += 3
         #elif op == "SUB": etc
@@ -76,7 +103,7 @@ class CPU:
         
         elif op == "DIV":
             pass
-        elif op == 0b00000001: #HLT
+        elif op == HLT:
             self.halted = True
             self.pc += 1
         elif op == "INC":
@@ -101,14 +128,14 @@ class CPU:
             pass
         elif op == "LD":
             pass
-        elif op == 0b10000010: #LDI
+        elif op == LDI:
             #sets the value of a register to an integer
             self.reg[reg_a] = reg_b
             self.pc +=3
             
         elif op == "MOD":
             pass
-        elif op == 0b10100010 :#MUL
+        elif op == MUL:
             self.reg[reg_a] *= self.reg[reg_b]
             self.pc += 3
         elif op == "NOP":
@@ -117,15 +144,25 @@ class CPU:
             pass
         elif op == "OR":
             pass
-        elif op == "POP":
-            pass
+        elif op == POP:
+            top_stack = self.SP
+            storage_reg = self.ram[self.pc+1]
+            self.reg[storage_reg] = top_stack
+            self.SP += 1
+            self.pc += 2
+            #pass
         elif op == "PRA":
             pass
-        elif op == 0b01000111: #PRN
+        elif op == PRN:
             print(self.reg[reg_a])
             self.pc += 2
-        elif op == "PUSH":
-            pass
+        elif op == PUSH:
+            self.SP -= 1
+            get_reg = self.ram[self.pc + 1]
+            value_in_reg = self.reg[get_reg]
+            self.ram[self.SP] = value_in_reg
+            self.pc += 2
+            #pass
         elif op == "RET":
             pass
         elif op == "SHL":
@@ -134,7 +171,7 @@ class CPU:
             pass
         elif op == "ST":
             pass
-        elif op == 0b10100001: #SUB
+        elif op == SUB:
             self.reg[reg_a] -= self.reg[reg_b]
             self.pc += 2
         elif op == "XOR":
@@ -171,7 +208,7 @@ class CPU:
             self.alu(self.ir,operand_a,operand_b)
             #self.pc +=1
 
-curr_file = "ls8/examples/mult.ls8"        
+curr_file = "ls8/examples/stack.ls8"        
 
 PC1 = CPU()
 PC1.load(curr_file)

@@ -14,7 +14,7 @@ def main(argv):
 
 
     cpu = CPU()
-
+    print(argv)
     cpu.load(argv[1])
     cpu.run()
 

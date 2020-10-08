@@ -144,10 +144,10 @@ class CPU:
             pass
         elif op == "OR":
             pass
-        elif op == POP:
-            top_stack = self.SP
-            storage_reg = self.ram[self.pc+1]
-            self.reg[storage_reg] = top_stack
+        elif op == POP:# not operating correctly, taking the value of self.SP (Stack pointer value instead of stack pointer pointee)
+            top_stack = self.ram_read(self.SP)
+            #storage_reg = self.reg[reg_a]
+            self.reg[reg_a] = top_stack
             self.SP += 1
             self.pc += 2
             #pass
@@ -158,10 +158,12 @@ class CPU:
             self.pc += 2
         elif op == PUSH:
             self.SP -= 1
-            get_reg = self.ram[self.pc + 1]
-            value_in_reg = self.reg[get_reg]
-            self.ram[self.SP] = value_in_reg
+            #get_reg = self.ram[self.pc + 1]
+            value_in_reg = self.reg[reg_a]
+            #self.ram[self.SP] = value_in_reg
+            self.ram_write(self.SP,value_in_reg,)
             self.pc += 2
+            
             #pass
         elif op == "RET":
             pass

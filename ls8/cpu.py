@@ -58,7 +58,7 @@ class CPU:
             print('file not found')
             sys.exit(1)            
         #self.SP -= 1#set the Stack pointer to the top of memory
-        self.SP = address
+        #self.SP = address
         
         #program = []    
         #for element in program1:
@@ -145,7 +145,7 @@ class CPU:
         elif op == "OR":
             pass
         elif op == POP:# not operating correctly, taking the value of self.SP (Stack pointer value instead of stack pointer pointee)
-            top_stack = self.ram_read(self.SP)
+            top_stack = self.ram_read(self.SP) # value at top of stack
             #storage_reg = self.reg[reg_a]
             self.reg[reg_a] = top_stack
             self.SP += 1
@@ -161,7 +161,7 @@ class CPU:
             #get_reg = self.ram[self.pc + 1]
             value_in_reg = self.reg[reg_a]
             #self.ram[self.SP] = value_in_reg
-            self.ram_write(self.SP,value_in_reg,)
+            self.ram_write(self.SP,value_in_reg)
             self.pc += 2
             
             #pass

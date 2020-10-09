@@ -10,6 +10,8 @@ ADD = 0b10100000
 SUB = 0b10100001
 PUSH = 0b01000101
 POP = 0b01000110
+CALL = 0b01010000
+RET = 0b00010001
 
 class CPU:
     """Main CPU class."""
@@ -94,8 +96,13 @@ class CPU:
         #elif op == "SUB": etc
         elif op == "AND":
             pass
-        elif op == "CALL":
-            pass
+        elif op == CALL:
+            self.SP -= 1
+            next_instruction = self.pc + 2
+            self.ram_write(self.SP,next_instruction)#stores the next instruction at the top of the stack for future use
+            #register to jump to is reg_a
+            self.pc = self.reg[reg_a]#jump to the register in the passed in value
+            #pass
         elif op == "CMP":
             pass
         elif op == "DEC":
@@ -144,7 +151,7 @@ class CPU:
             pass
         elif op == "OR":
             pass
-        elif op == POP:# not operating correctly, taking the value of self.SP (Stack pointer value instead of stack pointer pointee)
+        elif op == POP:
             top_stack = self.ram_read(self.SP) # value at top of stack
             #storage_reg = self.reg[reg_a]
             self.reg[reg_a] = top_stack
@@ -165,8 +172,12 @@ class CPU:
             self.pc += 2
             
             #pass
-        elif op == "RET":
-            pass
+        elif op == RET:
+            #here we need to grab the address from the top of the stack, and move back to it
+            return_address = self.ram_read(self.SP)
+            self.SP+=1
+            self.pc = return_address
+            #pass
         elif op == "SHL":
             pass
         elif op == "SHR":
@@ -210,7 +221,7 @@ class CPU:
             self.alu(self.ir,operand_a,operand_b)
             #self.pc +=1
 
-curr_file = "ls8/examples/stack.ls8"        
+curr_file = "ls8/examples/call.ls8"        
 
 PC1 = CPU()
 PC1.load(curr_file)

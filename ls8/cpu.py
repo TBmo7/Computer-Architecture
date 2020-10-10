@@ -12,6 +12,10 @@ PUSH = 0b01000101
 POP = 0b01000110
 CALL = 0b01010000
 RET = 0b00010001
+CMP = 0b10100111
+JMP = 0b01010100
+JNE = 0b01010110
+JEQ = 0b01010101
 
 class CPU:
     """Main CPU class."""
@@ -22,7 +26,7 @@ class CPU:
         self.ram = [0] * 256
         self.pc = 0 #program counter
         self.ir = 0 #instruction register
-        self.fl = [0] * 8 #Flags
+        self.fl = [0] * 8 #Flags self.fl[5] == less than, self.fl[6] greater, self.fl[7] equal to
         self.halted = False
         #self.sp = int() #stack pointer
         self.SP = self.reg[7]
@@ -103,8 +107,15 @@ class CPU:
             #register to jump to is reg_a
             self.pc = self.reg[reg_a]#jump to the register in the passed in value
             #pass
-        elif op == "CMP":
-            pass
+        elif op == CMP:
+            if self.reg[reg_a] == self.reg[reg_b]:
+                self.fl[7] = 1 #self.fl[7] is the equal flag
+            if self.reg[reg_a] > self.reg[reg_b]:
+                self.fl[6] = 1 # if a is greater than b, set the greater than flag (self.fl[6]) to 1
+            if self.reg[reg_a] < self.reg[reg_b]:
+                self.fl[5] = 1 # if a is less than b, set the less than flag (self.fl[5]) to 1
+            #pass
+            self.pc += 3
         elif op == "DEC":
             pass
         
@@ -119,8 +130,13 @@ class CPU:
             pass
         elif op == "IRET":
             pass
-        elif op == "JEQ":
-            pass
+        elif op == JEQ:
+            #if the equal flag is set to true, move to the address passed in
+            if self.fl[7] == 1:
+                self.pc = self.reg[reg_a]
+            else:
+                self.pc +=2
+            #pass
         elif op == "JGE":
             pass
         elif op == "JGT":
@@ -129,10 +145,18 @@ class CPU:
             pass
         elif op == "JLT":
             pass
-        elif op == "JMP":
-            pass
-        elif op == "JNE":
-            pass
+        elif op == JMP:
+            #if this is called, set self.pc to the register that is passed in
+            self.pc = self.reg[reg_a]
+            
+            #pass
+        elif op == JNE:
+            #if the equal to flag is clear, go to self.reg[reg_a]
+            if self.fl[7] == 0:
+                self.pc = self.reg[reg_a]
+            else:
+                self.pc += 2
+            #pass
         elif op == "LD":
             pass
         elif op == LDI:
@@ -221,7 +245,7 @@ class CPU:
             self.alu(self.ir,operand_a,operand_b)
             #self.pc +=1
 
-curr_file = "ls8/examples/call.ls8"        
+curr_file = "ls8/examples/test.ls8"        
 
 PC1 = CPU()
 PC1.load(curr_file)

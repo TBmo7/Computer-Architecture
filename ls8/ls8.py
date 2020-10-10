@@ -5,7 +5,20 @@
 import sys
 from cpu import *
 
-cpu = CPU()
+def main(argv):
+    if len(argv) != 2:
+        print("Incorrect Syntax")
+        return 1
+    
+    
 
-cpu.load()
-cpu.run()
+
+    cpu = CPU()
+    print(argv)
+    cpu.load(argv[1])
+    cpu.run()
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))
